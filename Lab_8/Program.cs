@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,6 +45,13 @@ namespace Lab_8
         public Account(TypeAccount type) : this(type, 0)
         {
         }
+        public Account(decimal balance) : this(TypeAccount.accountCurrent, balance)
+        {
+        }
+        public Account() : this(TypeAccount.accountCurrent, 0)
+        {
+        }
+
         public bool Withdraw(decimal money)
         {
             if (money > Balance)
@@ -53,6 +61,7 @@ namespace Lab_8
             else
             {
                 Balance -= money;
+                BankTransaction  transaction = new BankTransaction(money);
                 return true;
             }
         }
@@ -61,8 +70,10 @@ namespace Lab_8
             if (money <= 0)
             {
                 Console.WriteLine("Операцию произвести невозможно! Сумма должна быть больше 0");
+                return;
             }
             Balance += money;
+            BankTransaction transaction = new BankTransaction(money);
         }
         public bool PutMoneyFromAccount(ref Account account, decimal money)
         {
@@ -73,6 +84,7 @@ namespace Lab_8
             else
             {
                 Balance += money;
+                BankTransaction transaction = new BankTransaction(money);
                 return true;
             }
         }
@@ -87,14 +99,45 @@ namespace Lab_8
     }
     class BankTransaction
     {
-
+        private static Queue<BankTransaction> transactions = new Queue<BankTransaction>();
+        public readonly DateTime dateTime;
+        public readonly decimal balance;
+        public BankTransaction(decimal balance)
+        {
+            this.balance = balance;
+            dateTime = new DateTime();
+            transactions.Enqueue(this);
+        }
+        public override string ToString()
+        {
+            return $"{dateTime.ToShortDateString()} {dateTime.ToLongTimeString()} {balance}";
+        }
+        public void Dispose()
+        {
+            if (!File.Exists(@"output.txt"))
+            {
+                File.Create( @"output.txt");
+            }
+            using (StreamWriter fileWriter = new StreamWriter(@"output.txt", false))
+            {
+                while (transactions.Count != 0)
+                {
+                    fileWriter.WriteLine(transactions.Dequeue().ToString());
+                }
+            }
+            GC.SuppressFinalize(this);
+        }
     }
     class Song
     {
         public string Name { get; set; }
         public string Author { get; set; }
-        public Song PrevSong { get; set; } = null;
+        public Song PrevSong { get; set; } = null; // Чтобы конструктор Song() не выдал ошибки
 
+        public Song()
+        {
+            //Без данного конструктора возникнет ошибка.... Song mySong = new Song();
+        }
         public Song(string name, string author) : this(name, author, null)
         {
 
@@ -128,6 +171,27 @@ namespace Lab_8
     {
         static void Main(string[] args)
         {
+            DoTask();
+            //DoHomeTask1();
         }
+        static void DoTask()
+        {
+            Account account1 = new Account(TypeAccount.accountCurrent, 100);
+            Account account2 = new Account(TypeAccount.accountSavings, 200);
+            account2.PutMoneyFromAccount(ref account1, 50);
+            account1.PutMoney(100);
+            account2.Withdraw(75);
+        }
+        static void DoHomeTask1()
+        {
+            //Test ctor
+            Song song1 = new Song();
+            Song song2 = new Song("Хабиб", "Ягода малинка");
+            Song song3 = new Song("Клава Кока", "Пьяную домой", song2);
+            song1.Dispay();
+            song2.Dispay();
+            song3.Dispay();
+        }
+
     }
 }
