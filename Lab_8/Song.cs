@@ -29,6 +29,10 @@ namespace Lab_8
         public void Dispay()
         {
             Console.WriteLine($"\"{Name}\" by {Author}");
+            if (PrevSong != null)
+            {
+                Console.WriteLine($"Previos song: \"{PrevSong.Name}\" by {PrevSong.Author}");
+            }
         }
         public override bool Equals(Object obj)
         {
