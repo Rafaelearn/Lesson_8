@@ -1,8 +1,8 @@
 ﻿namespace TaskManager
 {
-    class Person
+    abstract class Person
     {
-        public string Name { get; set; }
+        public string Name { get; protected set; }
         public Person(string name)
         {
             Name = name;
@@ -15,5 +15,7 @@
         {
             return Name; 
         }
+        abstract public void Display();
     }
+
 }
