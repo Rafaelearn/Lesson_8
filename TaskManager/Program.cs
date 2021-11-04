@@ -14,13 +14,6 @@ namespace TaskManager
 
         static void Main(string[] args)
         {
-            //Test();
-            DoProgram();
-            //Interface();
-        }
-
-        static void DoProgram()
-        {
             Project project = new Project("discription project 1", DateTime.Now.AddDays(30), new Employee("Jason"), new Customer("Linda", 89393776955, "yeds@mail.ru"));
             ReadFromFileListEmployee(out List<Employee> team);
             Console.WriteLine("Команда разработчиков");
