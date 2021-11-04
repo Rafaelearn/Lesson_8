@@ -7,25 +7,25 @@ namespace TaskManager
     {
         public string Text { get; private set; }
         public DateTime Date { get; private set; }
-        public Person Author { get; private set; }
-        public Report(string text, Person employee)
+        public Employee Author { get; private set; }
+        public Report(string text, Employee employee)
         {
             Text = text;
             Author = employee;
-            Date = new DateTime(); // Генератор даты 
+            Date = DateTime.Now;
         }
-        public Report(FileInfo file, Person employee)
+        public Report(FileInfo file, Employee employee)
         {
             using (StreamReader reader = new StreamReader(file.FullName))
             {
                 Text = reader.ReadToEnd();
             }
             Author = employee;
-            Date = new DateTime();
+            Date = DateTime.Now;
         }
         public void Display()
         {
-            Console.WriteLine($"Author: {Author.ToString()} Time: {Date.ToShortDateString()} {Date.ToLongTimeString()}");
+            Console.WriteLine($"Author: {Author} Time: {Date.ToShortDateString()} {Date.ToLongTimeString()}");
             Console.WriteLine("Report: ");
             Console.WriteLine(Text);
         }
