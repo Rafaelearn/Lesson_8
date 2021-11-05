@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Lab_8
 {
@@ -7,12 +9,13 @@ namespace Lab_8
         accountCurrent = 1,
         accountSavings
     }
-    class Account
+    class Account:IDisposable
     {
         Random random = new Random();
         static ulong lastNumber = 4364_2868_4768_0000;
         public ulong Number { get; private set; }
         public TypeAccount Type { get; set; }
+        private  Queue<BankTransaction> transactions = new Queue<BankTransaction>();
         private decimal balance;
         public decimal Balance
         {
@@ -56,7 +59,7 @@ namespace Lab_8
             else
             {
                 Balance -= money;
-                BankTransaction  transaction = new BankTransaction(money);
+                transactions.Enqueue(new BankTransaction(-money));
                 return true;
             }
         }
@@ -68,7 +71,7 @@ namespace Lab_8
                 return;
             }
             Balance += money;
-            BankTransaction transaction = new BankTransaction(money);
+            transactions.Enqueue(new BankTransaction(money));
         }
         public bool PutMoneyFromAccount(ref Account account, decimal money)
         {
@@ -79,13 +82,24 @@ namespace Lab_8
             else
             {
                 Balance += money;
-                BankTransaction transaction = new BankTransaction(money);
+                transactions.Enqueue(new BankTransaction(money));
                 return true;
             }
         }
         public void Display()
         {
             Console.WriteLine("Информация о счете:\n" + $"{Type}\t{Number}\t{balance}$");
+        }
+        public void Dispose()
+        {
+            using (StreamWriter fileWriter = new StreamWriter(@"..\..\resource\output.txt", false))
+            {
+                while (transactions.Count != 0)
+                {
+                    fileWriter.WriteLine(transactions.Dequeue().ToString());
+                }
+            }
+            GC.SuppressFinalize(this);
         }
         public override string ToString()
         {
